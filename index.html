@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winnie's Food Map | 美食地圖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Animated Background Grid -->
+  <div class="grid-background"></div>
+  
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-brand">
+      <span class="brand-icon">🍜</span>
+      <span class="brand-text">Winnie's Food Map</span>
+    </div>
+    <div class="nav-links">
+      <a href="https://weiweichiang0813-art.github.io/portfolio/" target="_blank" class="nav-link">
+        <span class="nav-link-icon">←</span> Portfolio
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">foodmap_explorer.py</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="prompt">></span> 
+            <span class="command">init</span> 
+            <span class="arg">taste_adventure</span>
+            <span class="cursor">_</span>
+          </div>
+          <div class="terminal-line output">
+            <span class="success">✓</span> loading delicious data...
+          </div>
+        </div>
+      </div>
+      
+      <h1 class="hero-title">
+        Exploring <em>flavors</em> across Canada
+      </h1>
+      <p class="hero-subtitle">
+        Data-driven foodie documenting culinary adventures from Toronto to Montreal.
+      </p>
+      
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-number" id="totalPlaces">0</span>
+          <span class="stat-label">Places Visited</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="totalCities">0</span>
+          <span class="stat-label">Cities Explored</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="totalCuisines">0</span>
+          <span class="stat-label">Cuisines Tasted</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filter Section -->
+  <section class="filters-section">
+    <div class="filter-container">
+      <div class="filter-group">
+        <label class="filter-label">City</label>
+        <select id="cityFilter" class="filter-select">
+          <option value="all">All Cities</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Cuisine</label>
+        <select id="cuisineFilter" class="filter-select">
+          <option value="all">All Cuisines</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Rating</label>
+        <select id="ratingFilter" class="filter-select">
+          <option value="all">All Ratings</option>
+          <option value="5">⭐⭐⭐⭐⭐</option>
+          <option value="4">⭐⭐⭐⭐+</option>
+          <option value="3">⭐⭐⭐+</option>
+        </select>
+      </div>
+      <button id="resetFilters" class="reset-btn">Reset</button>
+    </div>
+  </section>
+
+  <!-- Map Section -->
+  <section class="map-section">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title">Interactive <em>Map</em></h2>
+    </div>
+    <div id="map" class="map-container"></div>
+  </section>
+
+  <!-- Restaurant List Section -->
+  <section class="list-section">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">Food <em>Directory</em></h2>
+    </div>
+    <div id="restaurantList" class="restaurant-grid"></div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">×</button>
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <div class="modal-rating" id="modalRating"></div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-info">
+          <div class="info-row">
+            <span class="info-icon">📍</span>
+            <span class="info-text" id="modalAddress"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-icon">🍽️</span>
+            <span class="info-text" id="modalCuisine"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-icon">📝</span>
+            <span class="info-text" id="modalType"></span>
+          </div>
+        </div>
+        <div class="modal-blog" id="modalBlog"></div>
+        <a id="modalMapLink" class="modal-map-btn" target="_blank">
+          Open in Google Maps →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2026 WEI WEI CHIANG — TORONTO</p>
+    <p class="footer-sub">Built with 🍜 and data</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
