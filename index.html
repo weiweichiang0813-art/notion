@@ -8,10 +8,662 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    /* ========================================
+       Winnie's Food Map - Dark Tech Theme
+       ======================================== */
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161d;
+      --bg-card-hover: #1c1c25;
+      
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --text-muted: #6a6a7a;
+      
+      --accent-primary: #6366f1;
+      --accent-secondary: #a855f7;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      
+      --success: #22c55e;
+      --warning: #eab308;
+      --error: #ef4444;
+      
+      --border-color: #2a2a35;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-display);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Grid Background */
+    .grid-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 15, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-icon { font-size: 1.5rem; }
+
+    .brand-text {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .nav-link {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(80px + 3rem) 2rem 3rem;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      text-align: center;
+    }
+
+    /* Terminal Window */
+    .terminal-window {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      text-align: left;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .terminal-header {
+      background: var(--bg-secondary);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: var(--error); }
+    .terminal-dot.yellow { background: var(--warning); }
+    .terminal-dot.green { background: var(--success); }
+
+    .terminal-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .terminal-body { padding: 1rem; }
+
+    .terminal-line {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .prompt { color: var(--accent-primary); }
+    .command { color: var(--text-primary); }
+    .arg { color: var(--accent-secondary); }
+    .success-text { color: var(--success); }
+    .output { color: var(--text-secondary); }
+
+    .cursor {
+      animation: blink 1s infinite;
+      color: var(--accent-primary);
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Hero Title */
+    .hero-title {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    /* Stats Row */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 2.5rem;
+      font-weight: 600;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Filter Section */
+    .filters-section {
+      padding: 1.5rem 2rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .filter-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .filter-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-select:hover,
+    .filter-select:focus {
+      border-color: var(--accent-primary);
+      outline: none;
+    }
+
+    .reset-btn {
+      padding: 0.6rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    /* Section Styles */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-number {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-primary);
+      opacity: 0.6;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .section-title em {
+      font-style: normal;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Map Section */
+    .map-section {
+      padding: 3rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .map-container {
+      height: 500px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 60px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Custom Leaflet Styles */
+    .leaflet-container { background: var(--bg-secondary); }
+
+    .custom-marker {
+      background: var(--accent-gradient);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border: 2px solid var(--bg-primary);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .custom-marker:hover { transform: scale(1.2); }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .leaflet-popup-content {
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      margin: 1rem;
+    }
+
+    .leaflet-popup-tip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+
+    .popup-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .popup-cuisine {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .popup-rating { font-size: 0.9rem; }
+
+    .popup-btn {
+      display: block;
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      background: var(--accent-gradient);
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    /* Restaurant List */
+    .list-section {
+      padding: 3rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .restaurant-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .restaurant-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-gradient);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .restaurant-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
+    }
+
+    .restaurant-card:hover::before { transform: scaleX(1); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .card-rating { font-size: 0.9rem; }
+
+    .card-cuisine {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-address {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .card-city {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .modal-close:hover { color: var(--text-primary); }
+
+    .modal-header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-rating { font-size: 1.2rem; }
+
+    .modal-body { padding: 2rem; }
+
+    .modal-info { margin-bottom: 1.5rem; }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-icon { font-size: 1.2rem; }
+
+    .info-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .modal-blog {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--accent-primary);
+    }
+
+    .modal-blog:empty { display: none; }
+
+    .modal-map-btn {
+      display: block;
+      text-align: center;
+      padding: 1rem;
+      background: var(--accent-gradient);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .modal-map-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .footer-sub {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav { padding: 0.5rem 1rem; }
+      .hero { padding: calc(60px + 2rem) 1rem 2rem; }
+      .hero-title { font-size: 1.8rem; }
+      .stats-row { gap: 1.5rem; }
+      .stat-number { font-size: 2rem; }
+      .filter-container { flex-direction: column; }
+      .filter-group { width: 100%; }
+      .map-container { height: 350px; }
+      .restaurant-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Animated Background Grid -->
   <div class="grid-background"></div>
   
   <!-- Navigation -->
@@ -20,11 +672,9 @@
       <span class="brand-icon">🍜</span>
       <span class="brand-text">Winnie's Food Map</span>
     </div>
-    <div class="nav-links">
-      <a href="https://weiweichiang0813-art.github.io/portfolio/" target="_blank" class="nav-link">
-        <span class="nav-link-icon">←</span> Portfolio
-      </a>
-    </div>
+    <a href="https://weiweichiang0813-art.github.io/portfolio/" target="_blank" class="nav-link">
+      ← Portfolio
+    </a>
   </nav>
 
   <!-- Hero Section -->
@@ -45,7 +695,7 @@
             <span class="cursor">_</span>
           </div>
           <div class="terminal-line output">
-            <span class="success">✓</span> loading delicious data...
+            <span class="success-text">✓</span> loading delicious data...
           </div>
         </div>
       </div>
@@ -158,6 +808,434 @@
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    // ============================================
+    // RESTAURANT DATA - 直接內嵌在這裡
+    // ============================================
+    const restaurants = [
+      {
+        "name": "Ramen Isshin",
+        "address": "421 College St, Toronto, ON",
+        "lat": 43.6564,
+        "lng": -79.4108,
+        "cuisine": "Japanese",
+        "type": "Main Noodle",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": "多倫多拉麵特輯第三彈來啦！喜歡拉麵在多倫多的朋友應該沒有人不知道這間的吧？這間的拉麵湯頭濃郁，辣味適中，湯汁完美的吸附在偏粗的麵條上，再配上清爽的豆芽菜，簡直不要太完美。整體我給他9/10！"
+      },
+      {
+        "name": "Pai Toronto",
+        "address": "196 Robert St, Toronto, ON",
+        "lat": 43.6568,
+        "lng": -79.3979,
+        "cuisine": "Thai",
+        "type": "Anything",
+        "rating": 5,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Kinton Ramen",
+        "address": "402 Queen St W, Toronto, ON",
+        "lat": 43.6493,
+        "lng": -79.3970,
+        "cuisine": "Japanese",
+        "type": "Main Noodle",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "SukhoTHAI",
+        "address": "52 Wellington St E, Toronto, ON",
+        "lat": 43.6486,
+        "lng": -79.3747,
+        "cuisine": "Thai",
+        "type": "Anything",
+        "rating": 5,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Raku",
+        "address": "456 Queen St W, Toronto, ON",
+        "lat": 43.6487,
+        "lng": -79.4021,
+        "cuisine": "Japanese",
+        "type": "Main Noodle",
+        "rating": 5,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "台妹滷味",
+        "address": "3272 Midland Ave, Scarborough, ON",
+        "lat": 43.8187,
+        "lng": -79.2936,
+        "cuisine": "Taiwanese",
+        "type": "Anything",
+        "rating": 5,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Pizzeria Badiali",
+        "address": "181 Dovercourt Rd, Toronto, ON",
+        "lat": 43.6432,
+        "lng": -79.4216,
+        "cuisine": "Italian",
+        "type": "Fast Food",
+        "rating": 5,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "HOJA 好呷",
+        "address": "3235 Hwy 7, Markham, ON",
+        "lat": 43.8562,
+        "lng": -79.3339,
+        "cuisine": "Taiwanese",
+        "type": "Main Rice",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": "台灣料理愛好者必訪！道地的台灣味道，讓你在加拿大也能品嚐到家鄉的美食。"
+      },
+      {
+        "name": "Dolce Gelato",
+        "address": "234 Augusta Ave, Toronto, ON",
+        "lat": 43.6545,
+        "lng": -79.4018,
+        "cuisine": "Italian",
+        "type": "Dessert",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Som Tum Jinda",
+        "address": "76 Gerrard St E, Toronto, ON",
+        "lat": 43.6585,
+        "lng": -79.3803,
+        "cuisine": "Thai",
+        "type": "Anything",
+        "rating": 3,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Ikkousha Ramen",
+        "address": "249 Queen St W, Toronto, ON",
+        "lat": 43.6502,
+        "lng": -79.3899,
+        "cuisine": "Japanese",
+        "type": "Main Noodle",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Schwartz's Deli",
+        "address": "3895 Boul. Saint-Laurent, Montréal, QC",
+        "lat": 45.5188,
+        "lng": -73.5774,
+        "cuisine": "Canadian",
+        "type": "Fast Food",
+        "rating": 4,
+        "city": "Montreal",
+        "blog": null
+      },
+      {
+        "name": "St-Viateur Bagel",
+        "address": "1127 Avenue du Mont-Royal E, Montréal, QC",
+        "lat": 45.5262,
+        "lng": -73.5897,
+        "cuisine": "Canadian",
+        "type": "Bakery",
+        "rating": 4,
+        "city": "Montreal",
+        "blog": null
+      },
+      {
+        "name": "D'Orsay",
+        "address": "65 Rue De Buade, Québec, QC",
+        "lat": 46.8139,
+        "lng": -71.2048,
+        "cuisine": "French",
+        "type": "Fine Dining",
+        "rating": 4,
+        "city": "Quebec City",
+        "blog": null
+      },
+      {
+        "name": "Korean Garden",
+        "address": "7197 Stanley Ave, Niagara Falls, ON",
+        "lat": 43.0896,
+        "lng": -79.0849,
+        "cuisine": "Korean",
+        "type": "Anything",
+        "rating": 4,
+        "city": "Niagara",
+        "blog": null
+      },
+      {
+        "name": "Karahi Boys",
+        "address": "741 Queen St W, Toronto, ON",
+        "lat": 43.6454,
+        "lng": -79.4107,
+        "cuisine": "Middle East",
+        "type": "Curry Style",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Flaming Noodles",
+        "address": "373 Spadina Ave, Toronto, ON",
+        "lat": 43.6551,
+        "lng": -79.3976,
+        "cuisine": "Chinese",
+        "type": "Main Noodle",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "MABU",
+        "address": "578 Yonge St, Toronto, ON",
+        "lat": 43.6653,
+        "lng": -79.3852,
+        "cuisine": "Taiwanese",
+        "type": "Anything",
+        "rating": 2,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Chopfire",
+        "address": "335 Spadina Ave, Toronto, ON",
+        "lat": 43.6527,
+        "lng": -79.3969,
+        "cuisine": "Chinese",
+        "type": "Anything",
+        "rating": 3,
+        "city": "Toronto",
+        "blog": null
+      },
+      {
+        "name": "Foxley Bistro and Bar",
+        "address": "207 Ossington Ave, Toronto, ON",
+        "lat": 43.6477,
+        "lng": -79.4206,
+        "cuisine": "Taiwanese",
+        "type": "Creative Cuisine",
+        "rating": 4,
+        "city": "Toronto",
+        "blog": null
+      }
+    ];
+
+    // ============================================
+    // APPLICATION CODE
+    // ============================================
+    let map = null;
+    let markers = [];
+    let currentFilters = { city: 'all', cuisine: 'all', rating: 'all' };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      initFilters();
+      initModal();
+      updateStats();
+      renderRestaurants();
+    });
+
+    // Initialize map
+    function initMap() {
+      map = L.map('map', {
+        center: [43.6532, -79.3832],
+        zoom: 11
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      addMarkers();
+    }
+
+    // Add markers
+    function addMarkers() {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const filtered = getFilteredRestaurants();
+
+      filtered.forEach(r => {
+        const icon = L.divIcon({
+          className: 'custom-marker-wrapper',
+          html: `<div class="custom-marker">${getCuisineEmoji(r.cuisine)}</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        const marker = L.marker([r.lat, r.lng], { icon })
+          .addTo(map)
+          .bindPopup(createPopupContent(r));
+
+        marker.on('click', () => openModal(r));
+        markers.push(marker);
+      });
+
+      if (markers.length > 0) {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.1));
+      }
+    }
+
+    function getCuisineEmoji(cuisine) {
+      const map = {
+        'Japanese': '🍜', 'Thai': '🍲', 'Chinese': '🥡', 'Taiwanese': '🧋',
+        'Italian': '🍝', 'Korean': '🍖', 'Vietnamese': '🍜', 'Canadian': '🍁',
+        'French': '🥐', 'Middle East': '🧆', 'American': '🍔'
+      };
+      return map[cuisine] || '🍽️';
+    }
+
+    function createPopupContent(r) {
+      return `
+        <div class="popup-content">
+          <div class="popup-title">${r.name}</div>
+          <div class="popup-cuisine">${r.cuisine} • ${r.type}</div>
+          <div class="popup-rating">${'⭐'.repeat(r.rating)}</div>
+        </div>
+      `;
+    }
+
+    // Filters
+    function initFilters() {
+      const cityFilter = document.getElementById('cityFilter');
+      const cuisineFilter = document.getElementById('cuisineFilter');
+      const ratingFilter = document.getElementById('ratingFilter');
+      const resetBtn = document.getElementById('resetFilters');
+
+      [...new Set(restaurants.map(r => r.city))].sort().forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.textContent = city;
+        cityFilter.appendChild(opt);
+      });
+
+      [...new Set(restaurants.map(r => r.cuisine))].sort().forEach(cuisine => {
+        const opt = document.createElement('option');
+        opt.value = cuisine;
+        opt.textContent = cuisine;
+        cuisineFilter.appendChild(opt);
+      });
+
+      cityFilter.addEventListener('change', e => { currentFilters.city = e.target.value; applyFilters(); });
+      cuisineFilter.addEventListener('change', e => { currentFilters.cuisine = e.target.value; applyFilters(); });
+      ratingFilter.addEventListener('change', e => { currentFilters.rating = e.target.value; applyFilters(); });
+      
+      resetBtn.addEventListener('click', () => {
+        currentFilters = { city: 'all', cuisine: 'all', rating: 'all' };
+        cityFilter.value = cuisineFilter.value = ratingFilter.value = 'all';
+        applyFilters();
+      });
+    }
+
+    function getFilteredRestaurants() {
+      return restaurants.filter(r => {
+        if (currentFilters.city !== 'all' && r.city !== currentFilters.city) return false;
+        if (currentFilters.cuisine !== 'all' && r.cuisine !== currentFilters.cuisine) return false;
+        if (currentFilters.rating !== 'all' && r.rating < parseInt(currentFilters.rating)) return false;
+        return true;
+      });
+    }
+
+    function applyFilters() {
+      addMarkers();
+      renderRestaurants();
+    }
+
+    // Render cards
+    function renderRestaurants() {
+      const container = document.getElementById('restaurantList');
+      const filtered = getFilteredRestaurants();
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No restaurants found</p></div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(r => `
+        <div class="restaurant-card" onclick='openModal(${JSON.stringify(r).replace(/'/g, "\\'")})'>
+          <div class="card-header">
+            <h3 class="card-title">${r.name}</h3>
+            <span class="card-rating">${'⭐'.repeat(r.rating)}</span>
+          </div>
+          <span class="card-cuisine">${r.cuisine}</span>
+          <p class="card-address">${r.address}</p>
+          <p class="card-city">📍 ${r.city}</p>
+        </div>
+      `).join('');
+    }
+
+    // Stats animation
+    function updateStats() {
+      animateNumber('totalPlaces', restaurants.length);
+      animateNumber('totalCities', new Set(restaurants.map(r => r.city)).size);
+      animateNumber('totalCuisines', new Set(restaurants.map(r => r.cuisine)).size);
+    }
+
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      const duration = 1500;
+      const start = performance.now();
+      
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Modal
+    function initModal() {
+      const modal = document.getElementById('detailModal');
+      document.getElementById('closeModal').addEventListener('click', closeModal);
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    }
+
+    function openModal(r) {
+      const modal = document.getElementById('detailModal');
+      document.getElementById('modalTitle').textContent = r.name;
+      document.getElementById('modalRating').textContent = '⭐'.repeat(r.rating);
+      document.getElementById('modalAddress').textContent = r.address;
+      document.getElementById('modalCuisine').textContent = r.cuisine;
+      document.getElementById('modalType').textContent = r.type;
+      
+      const blogEl = document.getElementById('modalBlog');
+      blogEl.textContent = r.blog || '';
+      blogEl.style.display = r.blog ? 'block' : 'none';
+      
+      document.getElementById('modalMapLink').href = 
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + r.address)}`;
+      
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  </script>
 </body>
 </html>
