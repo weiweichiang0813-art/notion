@@ -6,40 +6,35 @@
   <title>Winnie's Food Map | 美食地圖</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
-    /* ========================================
-       Winnie's Food Map - Dark Tech Theme
-       ======================================== */
-
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #111118;
-      --bg-card: #16161d;
-      --bg-card-hover: #1c1c25;
+      --bg-primary: #f8fbfc;
+      --bg-secondary: #eef5f7;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f0f7f9;
       
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #6a6a7a;
+      --text-primary: #1a3a4a;
+      --text-secondary: #5a7a8a;
+      --text-muted: #8aa0ac;
       
-      --accent-primary: #6366f1;
-      --accent-secondary: #a855f7;
-      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --accent-primary: #0891b2;
+      --accent-secondary: #06b6d4;
+      --accent-light: rgba(8, 145, 178, 0.1);
       
-      --success: #22c55e;
-      --warning: #eab308;
-      --error: #ef4444;
+      --border-color: #d4e5eb;
+      --shadow-sm: 0 2px 8px rgba(26, 58, 74, 0.06);
+      --shadow-md: 0 8px 24px rgba(26, 58, 74, 0.08);
+      --shadow-lg: 0 16px 48px rgba(26, 58, 74, 0.12);
       
-      --border-color: #2a2a35;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
       
-      --font-display: 'Outfit', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      
-      --radius-sm: 6px;
+      --radius-sm: 8px;
       --radius-md: 12px;
-      --radius-lg: 16px;
+      --radius-lg: 20px;
     }
 
     *, *::before, *::after {
@@ -51,26 +46,11 @@
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: var(--font-display);
-      background: var(--bg-primary);
+      font-family: var(--font-body);
+      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      min-height: 100vh;
       color: var(--text-primary);
       line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* Grid Background */
-    .grid-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-      z-index: -1;
     }
 
     /* Navigation */
@@ -80,169 +60,116 @@
       left: 0;
       right: 0;
       z-index: 1000;
-      padding: 1rem 2rem;
+      padding: 1.25rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(10, 10, 15, 0.9);
+      background: rgba(248, 251, 252, 0.9);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-color);
     }
 
     .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      font-style: italic;
+      text-decoration: none;
     }
 
-    .brand-icon { font-size: 1.5rem; }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
 
-    .brand-text {
-      font-family: var(--font-mono);
-      font-size: 0.9rem;
+    .nav-links a {
+      font-size: 0.85rem;
       font-weight: 500;
       color: var(--text-secondary);
-    }
-
-    .nav-link {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      color: var(--text-secondary);
       text-decoration: none;
-      padding: 0.5rem 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color 0.2s ease;
+      padding-bottom: 4px;
+      border-bottom: 2px solid transparent;
     }
 
-    .nav-link:hover {
+    .nav-links a:hover,
+    .nav-links a.active {
       color: var(--text-primary);
-      border-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.1);
+      border-bottom-color: var(--accent-primary);
     }
 
     /* Hero Section */
     .hero {
-      min-height: 70vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: calc(80px + 3rem) 2rem 3rem;
+      padding: calc(80px + 5rem) 3rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .hero-content {
-      max-width: 800px;
-      text-align: center;
-    }
-
-    /* Terminal Window */
-    .terminal-window {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      margin-bottom: 2rem;
-      text-align: left;
-      max-width: 420px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .terminal-header {
-      background: var(--bg-secondary);
-      padding: 0.5rem 1rem;
-      display: flex;
+    .hero-label {
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .terminal-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .terminal-dot.red { background: var(--error); }
-    .terminal-dot.yellow { background: var(--warning); }
-    .terminal-dot.green { background: var(--success); }
-
-    .terminal-title {
-      font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-left: auto;
-    }
-
-    .terminal-body { padding: 1rem; }
-
-    .terminal-line {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .prompt { color: var(--accent-primary); }
-    .command { color: var(--text-primary); }
-    .arg { color: var(--accent-secondary); }
-    .success-text { color: var(--success); }
-    .output { color: var(--text-secondary); }
-
-    .cursor {
-      animation: blink 1s infinite;
+      font-weight: 500;
       color: var(--accent-primary);
-    }
-
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-
-    /* Hero Title */
-    .hero-title {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
-      font-weight: 700;
-      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
       margin-bottom: 1rem;
     }
 
-    .hero-title em {
-      font-style: normal;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero-label::before {
+      content: '';
+      width: 24px;
+      height: 2px;
+      background: var(--accent-primary);
     }
 
-    .hero-subtitle {
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent-primary);
+    }
+
+    .hero-description {
       font-size: 1.1rem;
       color: var(--text-secondary);
-      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
     }
 
-    /* Stats Row */
+    /* Stats */
     .stats-row {
       display: flex;
-      justify-content: center;
       gap: 3rem;
-      flex-wrap: wrap;
     }
 
-    .stat-item { text-align: center; }
+    .stat-item {
+      text-align: left;
+    }
 
     .stat-number {
       display: block;
-      font-family: var(--font-mono);
+      font-family: var(--font-display);
       font-size: 2.5rem;
       font-weight: 600;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--accent-primary);
     }
 
     .stat-label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -250,30 +177,32 @@
 
     /* Filter Section */
     .filters-section {
-      padding: 1.5rem 2rem;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .filter-container {
-      max-width: 1200px;
-      margin: 0 auto;
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       flex-wrap: wrap;
       align-items: flex-end;
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
     }
 
     .filter-group {
       flex: 1;
-      min-width: 150px;
+      min-width: 160px;
     }
 
     .filter-label {
       display: block;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 500;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -282,234 +211,207 @@
 
     .filter-select {
       width: 100%;
-      padding: 0.6rem 1rem;
-      background: var(--bg-card);
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       color: var(--text-primary);
-      font-family: var(--font-display);
+      font-family: var(--font-body);
       font-size: 0.9rem;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .filter-select:hover,
     .filter-select:focus {
       border-color: var(--accent-primary);
       outline: none;
+      background: var(--bg-card);
     }
 
     .reset-btn {
-      padding: 0.6rem 1.5rem;
+      padding: 0.75rem 1.5rem;
       background: transparent;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
+      color: var(--text-muted);
+      font-family: var(--font-body);
       font-size: 0.85rem;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
 
     .reset-btn:hover {
-      border-color: var(--error);
-      color: var(--error);
-    }
-
-    /* Section Styles */
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .section-number {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
+      border-color: var(--accent-primary);
       color: var(--accent-primary);
-      opacity: 0.6;
     }
 
-    .section-title {
-      font-size: 1.8rem;
-      font-weight: 600;
-    }
-
-    .section-title em {
-      font-style: normal;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* Map Section */
-    .map-section {
-      padding: 3rem 2rem;
-      max-width: 1400px;
+    /* Section Headers */
+    .section {
+      padding: 2rem 3rem;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
-    .map-container {
-      height: 500px;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 0 60px rgba(99, 102, 241, 0.1);
+    .section-header {
+      margin-bottom: 1.5rem;
     }
 
-    /* Custom Leaflet Styles */
-    .leaflet-container { background: var(--bg-secondary); }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 400;
+      color: var(--text-primary);
+    }
+
+    .section-title em {
+      font-style: italic;
+      color: var(--accent-primary);
+    }
+
+    /* Map */
+    .map-container {
+      height: 450px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .leaflet-container {
+      background: var(--bg-secondary);
+    }
 
     .custom-marker {
-      background: var(--accent-gradient);
+      background: var(--accent-primary);
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
-      border: 2px solid var(--bg-primary);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      border: 3px solid white;
+      box-shadow: var(--shadow-md);
       cursor: pointer;
-      transition: transform 0.15s ease;
+      transition: transform 0.2s ease;
     }
 
-    .custom-marker:hover { transform: scale(1.2); }
+    .custom-marker:hover {
+      transform: scale(1.15);
+    }
 
     .leaflet-popup-content-wrapper {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
     }
 
     .leaflet-popup-content {
       color: var(--text-primary);
-      font-family: var(--font-display);
+      font-family: var(--font-body);
       margin: 1rem;
     }
 
     .leaflet-popup-tip {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
     }
 
     .popup-title {
+      font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.25rem;
     }
 
     .popup-cuisine {
-      font-family: var(--font-mono);
       font-size: 0.75rem;
       color: var(--accent-primary);
       margin-bottom: 0.25rem;
     }
 
-    .popup-rating { font-size: 0.9rem; }
-
-    .popup-btn {
-      display: block;
-      margin-top: 0.5rem;
-      padding: 0.4rem 0.6rem;
-      background: var(--accent-gradient);
-      color: white;
-      text-align: center;
-      text-decoration: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-      font-weight: 500;
-      border: none;
-      cursor: pointer;
-      width: 100%;
+    .popup-rating {
+      font-size: 0.85rem;
     }
 
-    /* Restaurant List */
-    .list-section {
-      padding: 3rem 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
+    /* Restaurant Grid */
     .restaurant-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 1.5rem;
     }
 
     .restaurant-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
-      overflow: hidden;
-    }
-
-    .restaurant-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--accent-gradient);
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
     }
 
     .restaurant-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-md);
       transform: translateY(-4px);
-      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
+      border-color: var(--accent-primary);
     }
-
-    .restaurant-card:hover::before { transform: scaleX(1); }
 
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .card-title {
-      font-size: 1.1rem;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
       font-weight: 600;
+      color: var(--text-primary);
     }
 
-    .card-rating { font-size: 0.9rem; }
+    .card-rating {
+      font-size: 0.85rem;
+    }
 
     .card-cuisine {
-      font-family: var(--font-mono);
       font-size: 0.75rem;
+      font-weight: 500;
       color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.1);
-      padding: 0.25rem 0.5rem;
-      border-radius: var(--radius-sm);
+      background: var(--accent-light);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
       display: inline-block;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
     }
 
     .card-address {
       font-size: 0.85rem;
       color: var(--text-secondary);
+      line-height: 1.5;
     }
 
     .card-city {
-      font-family: var(--font-mono);
       font-size: 0.7rem;
       color: var(--text-muted);
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+    }
+
+    .card-preview {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     /* Modal */
@@ -520,26 +422,28 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
+      background: rgba(26, 58, 74, 0.4);
+      backdrop-filter: blur(8px);
       z-index: 2000;
       align-items: center;
       justify-content: center;
       padding: 2rem;
     }
 
-    .modal.active { display: flex; }
+    .modal.active {
+      display: flex;
+    }
 
     .modal-content {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      max-width: 500px;
+      max-width: 550px;
       width: 100%;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
       position: relative;
       animation: modalSlideIn 0.3s ease;
+      box-shadow: var(--shadow-lg);
     }
 
     @keyframes modalSlideIn {
@@ -549,47 +453,74 @@
 
     .modal-close {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: var(--bg-secondary);
       border: none;
       color: var(--text-muted);
-      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.25rem;
       cursor: pointer;
-      transition: color 0.15s ease;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .modal-close:hover { color: var(--text-primary); }
+    .modal-close:hover {
+      background: var(--accent-light);
+      color: var(--accent-primary);
+    }
 
     .modal-header {
-      padding: 2rem;
+      padding: 2rem 2rem 1.5rem;
       border-bottom: 1px solid var(--border-color);
     }
 
-    .modal-title {
-      font-size: 1.5rem;
-      font-weight: 600;
+    .modal-cuisine {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       margin-bottom: 0.5rem;
     }
 
-    .modal-rating { font-size: 1.2rem; }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
 
-    .modal-body { padding: 2rem; }
+    .modal-rating {
+      font-size: 1.1rem;
+    }
 
-    .modal-info { margin-bottom: 1.5rem; }
+    .modal-body {
+      padding: 1.5rem 2rem 2rem;
+    }
+
+    .modal-info {
+      margin-bottom: 1.5rem;
+    }
 
     .info-row {
       display: flex;
       align-items: flex-start;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
     }
 
-    .info-icon { font-size: 1.2rem; }
-
-    .info-text {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
+    .info-icon {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
     }
 
     .modal-blog {
@@ -601,125 +532,138 @@
       line-height: 1.8;
       color: var(--text-secondary);
       border-left: 3px solid var(--accent-primary);
+      white-space: pre-wrap;
     }
 
-    .modal-blog:empty { display: none; }
+    .modal-blog:empty {
+      display: none;
+    }
 
     .modal-map-btn {
       display: block;
       text-align: center;
       padding: 1rem;
-      background: var(--accent-gradient);
+      background: var(--accent-primary);
       color: white;
       text-decoration: none;
       border-radius: var(--radius-sm);
       font-weight: 500;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
     }
 
     .modal-map-btn:hover {
+      background: var(--accent-secondary);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      box-shadow: var(--shadow-md);
     }
 
     /* Footer */
     .footer {
       text-align: center;
-      padding: 2rem;
-      border-top: 1px solid var(--border-color);
+      padding: 3rem;
       color: var(--text-muted);
-      font-family: var(--font-mono);
       font-size: 0.85rem;
     }
 
-    .footer-sub {
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
+    .footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
     }
 
     /* Empty State */
     .empty-state {
       text-align: center;
-      padding: 3rem;
+      padding: 4rem 2rem;
       color: var(--text-muted);
+      grid-column: 1 / -1;
     }
 
     .empty-state-icon {
       font-size: 3rem;
       margin-bottom: 1rem;
+      opacity: 0.5;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .nav { padding: 0.5rem 1rem; }
-      .hero { padding: calc(60px + 2rem) 1rem 2rem; }
-      .hero-title { font-size: 1.8rem; }
-      .stats-row { gap: 1.5rem; }
-      .stat-number { font-size: 2rem; }
-      .filter-container { flex-direction: column; }
-      .filter-group { width: 100%; }
-      .map-container { height: 350px; }
-      .restaurant-grid { grid-template-columns: 1fr; }
+      .nav {
+        padding: 1rem 1.5rem;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .hero, .filters-section, .section {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .stats-row {
+        gap: 2rem;
+      }
+      
+      .stat-number {
+        font-size: 2rem;
+      }
+      
+      .filter-container {
+        flex-direction: column;
+      }
+      
+      .filter-group {
+        width: 100%;
+      }
+      
+      .map-container {
+        height: 300px;
+      }
+      
+      .restaurant-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="grid-background"></div>
-  
   <!-- Navigation -->
   <nav class="nav">
-    <div class="nav-brand">
-      <span class="brand-icon">🍜</span>
-      <span class="brand-text">Winnie's Food Map</span>
-    </div>
-    <a href="https://weiweichiang0813-art.github.io/portfolio/" target="_blank" class="nav-link">
-      ← Portfolio
-    </a>
+    <a href="https://weiweichiang0813-art.github.io/portfolio/" class="nav-brand">Home</a>
+    <ul class="nav-links">
+      <li><a href="#map">Map</a></li>
+      <li><a href="#directory">Directory</a></li>
+      <li><a href="https://weiweichiang0813-art.github.io/portfolio/" target="_blank">Portfolio</a></li>
+    </ul>
   </nav>
 
   <!-- Hero Section -->
   <header class="hero">
-    <div class="hero-content">
-      <div class="terminal-window">
-        <div class="terminal-header">
-          <span class="terminal-dot red"></span>
-          <span class="terminal-dot yellow"></span>
-          <span class="terminal-dot green"></span>
-          <span class="terminal-title">foodmap_explorer.py</span>
-        </div>
-        <div class="terminal-body">
-          <div class="terminal-line">
-            <span class="prompt">></span> 
-            <span class="command">init</span> 
-            <span class="arg">taste_adventure</span>
-            <span class="cursor">_</span>
-          </div>
-          <div class="terminal-line output">
-            <span class="success-text">✓</span> loading delicious data...
-          </div>
-        </div>
+    <div class="hero-label">Food Explorer</div>
+    <h1 class="hero-title">Discovering <em>flavors</em> across Canada</h1>
+    <p class="hero-description">
+      A personal collection of culinary adventures — from Toronto's hidden gems to Montreal's iconic spots. Each review is a story of taste, ambiance, and memorable moments.
+    </p>
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number" id="totalPlaces">0</span>
+        <span class="stat-label">Places Visited</span>
       </div>
-      
-      <h1 class="hero-title">
-        Exploring <em>flavors</em> across Canada
-      </h1>
-      <p class="hero-subtitle">
-        Data-driven foodie documenting culinary adventures from Toronto to Montreal.
-      </p>
-      
-      <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-number" id="totalPlaces">0</span>
-          <span class="stat-label">Places Visited</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number" id="totalCities">0</span>
-          <span class="stat-label">Cities Explored</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number" id="totalCuisines">0</span>
-          <span class="stat-label">Cuisines Tasted</span>
-        </div>
+      <div class="stat-item">
+        <span class="stat-number" id="totalCities">0</span>
+        <span class="stat-label">Cities Explored</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="totalCuisines">0</span>
+        <span class="stat-label">Cuisines Tasted</span>
       </div>
     </div>
   </header>
@@ -743,9 +687,9 @@
         <label class="filter-label">Rating</label>
         <select id="ratingFilter" class="filter-select">
           <option value="all">All Ratings</option>
-          <option value="5">⭐⭐⭐⭐⭐</option>
-          <option value="4">⭐⭐⭐⭐+</option>
-          <option value="3">⭐⭐⭐+</option>
+          <option value="5">⭐⭐⭐⭐⭐ Only</option>
+          <option value="4">⭐⭐⭐⭐ & Above</option>
+          <option value="3">⭐⭐⭐ & Above</option>
         </select>
       </div>
       <button id="resetFilters" class="reset-btn">Reset</button>
@@ -753,28 +697,27 @@
   </section>
 
   <!-- Map Section -->
-  <section class="map-section">
+  <section id="map" class="section">
     <div class="section-header">
-      <span class="section-number">01</span>
       <h2 class="section-title">Interactive <em>Map</em></h2>
     </div>
-    <div id="map" class="map-container"></div>
+    <div id="mapContainer" class="map-container"></div>
   </section>
 
-  <!-- Restaurant List Section -->
-  <section class="list-section">
+  <!-- Restaurant List -->
+  <section id="directory" class="section">
     <div class="section-header">
-      <span class="section-number">02</span>
       <h2 class="section-title">Food <em>Directory</em></h2>
     </div>
     <div id="restaurantList" class="restaurant-grid"></div>
   </section>
 
-  <!-- Detail Modal -->
+  <!-- Modal -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <button class="modal-close" id="closeModal">×</button>
       <div class="modal-header">
+        <div class="modal-cuisine" id="modalCuisineType"></div>
         <h2 class="modal-title" id="modalTitle"></h2>
         <div class="modal-rating" id="modalRating"></div>
       </div>
@@ -782,15 +725,11 @@
         <div class="modal-info">
           <div class="info-row">
             <span class="info-icon">📍</span>
-            <span class="info-text" id="modalAddress"></span>
+            <span id="modalAddress"></span>
           </div>
           <div class="info-row">
-            <span class="info-icon">🍽️</span>
-            <span class="info-text" id="modalCuisine"></span>
-          </div>
-          <div class="info-row">
-            <span class="info-icon">📝</span>
-            <span class="info-text" id="modalType"></span>
+            <span class="info-icon">🏷️</span>
+            <span id="modalType"></span>
           </div>
         </div>
         <div class="modal-blog" id="modalBlog"></div>
@@ -803,237 +742,698 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <p>© 2026 WEI WEI CHIANG — TORONTO</p>
-    <p class="footer-sub">Built with 🍜 and data</p>
+    <p>© 2026 Wei Wei Chiang · <a href="https://weiweichiang0813-art.github.io/portfolio/">Back to Portfolio</a></p>
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     // ============================================
-    // RESTAURANT DATA - 直接內嵌在這裡
+    // RESTAURANT DATA
     // ============================================
     const restaurants = [
-      {
-        "name": "Ramen Isshin",
-        "address": "421 College St, Toronto, ON",
-        "lat": 43.6564,
-        "lng": -79.4108,
-        "cuisine": "Japanese",
-        "type": "Main Noodle",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": "多倫多拉麵特輯第三彈來啦！喜歡拉麵在多倫多的朋友應該沒有人不知道這間的吧？這間的拉麵湯頭濃郁，辣味適中，湯汁完美的吸附在偏粗的麵條上，再配上清爽的豆芽菜，簡直不要太完美。整體我給他9/10！"
-      },
-      {
-        "name": "Pai Toronto",
-        "address": "196 Robert St, Toronto, ON",
-        "lat": 43.6568,
-        "lng": -79.3979,
-        "cuisine": "Thai",
-        "type": "Anything",
-        "rating": 5,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Kinton Ramen",
-        "address": "402 Queen St W, Toronto, ON",
-        "lat": 43.6493,
-        "lng": -79.3970,
-        "cuisine": "Japanese",
-        "type": "Main Noodle",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "SukhoTHAI",
-        "address": "52 Wellington St E, Toronto, ON",
-        "lat": 43.6486,
-        "lng": -79.3747,
-        "cuisine": "Thai",
-        "type": "Anything",
-        "rating": 5,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Raku",
-        "address": "456 Queen St W, Toronto, ON",
-        "lat": 43.6487,
-        "lng": -79.4021,
-        "cuisine": "Japanese",
-        "type": "Main Noodle",
-        "rating": 5,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "台妹滷味",
-        "address": "3272 Midland Ave, Scarborough, ON",
-        "lat": 43.8187,
-        "lng": -79.2936,
-        "cuisine": "Taiwanese",
-        "type": "Anything",
-        "rating": 5,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Pizzeria Badiali",
-        "address": "181 Dovercourt Rd, Toronto, ON",
-        "lat": 43.6432,
-        "lng": -79.4216,
-        "cuisine": "Italian",
-        "type": "Fast Food",
-        "rating": 5,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "HOJA 好呷",
-        "address": "3235 Hwy 7, Markham, ON",
-        "lat": 43.8562,
-        "lng": -79.3339,
-        "cuisine": "Taiwanese",
-        "type": "Main Rice",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": "台灣料理愛好者必訪！道地的台灣味道，讓你在加拿大也能品嚐到家鄉的美食。"
-      },
-      {
-        "name": "Dolce Gelato",
-        "address": "234 Augusta Ave, Toronto, ON",
-        "lat": 43.6545,
-        "lng": -79.4018,
-        "cuisine": "Italian",
-        "type": "Dessert",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Som Tum Jinda",
-        "address": "76 Gerrard St E, Toronto, ON",
-        "lat": 43.6585,
-        "lng": -79.3803,
-        "cuisine": "Thai",
-        "type": "Anything",
-        "rating": 3,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Ikkousha Ramen",
-        "address": "249 Queen St W, Toronto, ON",
-        "lat": 43.6502,
-        "lng": -79.3899,
-        "cuisine": "Japanese",
-        "type": "Main Noodle",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Schwartz's Deli",
-        "address": "3895 Boul. Saint-Laurent, Montréal, QC",
-        "lat": 45.5188,
-        "lng": -73.5774,
-        "cuisine": "Canadian",
-        "type": "Fast Food",
-        "rating": 4,
-        "city": "Montreal",
-        "blog": null
-      },
-      {
-        "name": "St-Viateur Bagel",
-        "address": "1127 Avenue du Mont-Royal E, Montréal, QC",
-        "lat": 45.5262,
-        "lng": -73.5897,
-        "cuisine": "Canadian",
-        "type": "Bakery",
-        "rating": 4,
-        "city": "Montreal",
-        "blog": null
-      },
-      {
-        "name": "D'Orsay",
-        "address": "65 Rue De Buade, Québec, QC",
-        "lat": 46.8139,
-        "lng": -71.2048,
-        "cuisine": "French",
-        "type": "Fine Dining",
-        "rating": 4,
-        "city": "Quebec City",
-        "blog": null
-      },
-      {
-        "name": "Korean Garden",
-        "address": "7197 Stanley Ave, Niagara Falls, ON",
-        "lat": 43.0896,
-        "lng": -79.0849,
-        "cuisine": "Korean",
-        "type": "Anything",
-        "rating": 4,
-        "city": "Niagara",
-        "blog": null
-      },
-      {
-        "name": "Karahi Boys",
-        "address": "741 Queen St W, Toronto, ON",
-        "lat": 43.6454,
-        "lng": -79.4107,
-        "cuisine": "Middle East",
-        "type": "Curry Style",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Flaming Noodles",
-        "address": "373 Spadina Ave, Toronto, ON",
-        "lat": 43.6551,
-        "lng": -79.3976,
-        "cuisine": "Chinese",
-        "type": "Main Noodle",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "MABU",
-        "address": "578 Yonge St, Toronto, ON",
-        "lat": 43.6653,
-        "lng": -79.3852,
-        "cuisine": "Taiwanese",
-        "type": "Anything",
-        "rating": 2,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Chopfire",
-        "address": "335 Spadina Ave, Toronto, ON",
-        "lat": 43.6527,
-        "lng": -79.3969,
-        "cuisine": "Chinese",
-        "type": "Anything",
-        "rating": 3,
-        "city": "Toronto",
-        "blog": null
-      },
-      {
-        "name": "Foxley Bistro and Bar",
-        "address": "207 Ossington Ave, Toronto, ON",
-        "lat": 43.6477,
-        "lng": -79.4206,
-        "cuisine": "Taiwanese",
-        "type": "Creative Cuisine",
-        "rating": 4,
-        "city": "Toronto",
-        "blog": null
-      }
-    ];
+  {
+    "name": "Le Mien Craft Noodle",
+    "address": "43 William St, Ottawa, ON K1N 6Z9",
+    "lat": 45.4281,
+    "lng": -75.6939,
+    "cuisine": "Chinese",
+    "type": "Main Noodle",
+    "rating": 3,
+    "city": "Ottawa",
+    "blog": null
+  },
+  {
+    "name": "BeaverTails",
+    "address": "69 George St, Ottawa, ON K1N 1K1",
+    "lat": 45.4271,
+    "lng": -75.694,
+    "cuisine": "Canadian",
+    "type": "Dessert",
+    "rating": 3,
+    "city": "Ottawa",
+    "blog": null
+  },
+  {
+    "name": "Two River Store",
+    "address": "South highway 60 at km 31.4 in Algonquin Provincial Park, ON P0A 1H0",
+    "lat": 45.5492,
+    "lng": -78.498,
+    "cuisine": "Canadian",
+    "type": "Dessert",
+    "rating": 3,
+    "city": "Algonquin",
+    "blog": null
+  },
+  {
+    "name": "Boathouse Seafood Restaurant",
+    "address": "32 S Front St, Belleville, ON K8N 2Y3",
+    "lat": 44.1630,
+    "lng": -77.3830,
+    "cuisine": "American",
+    "type": "Seafood",
+    "rating": 3,
+    "city": "Belleville",
+    "blog": null
+  },
+  {
+    "name": "Laverne's Eatery",
+    "address": "21 King St E, Gananoque, ON K7G 1E8",
+    "lat": 44.3300,
+    "lng": -76.1620,
+    "cuisine": "Italian",
+    "type": "Brunch",
+    "rating": 3,
+    "city": "Kingston",
+    "blog": null
+  },
+  {
+    "name": "wang lang",
+    "address": "669 King St W, Toronto, ON M5V 1M9",
+    "lat": 43.6445,
+    "lng": -79.4020,
+    "cuisine": "Thai",
+    "type": "Main Noodle",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "來多倫多第一次吃泰式🤤\n🍴：wang lang\n📍 669 King St W, Toronto, ON M5V 1M9\n\n1️⃣泰式河粉🌟🌟🌟\n口味偏甜，不適合我的口味，但整體吃起來蠻清爽，給過！\n\n2️⃣海鮮冬蔭鍋🌟🌟🌟🌟\n這鍋真的超值好吃！口味偏辣不會死鹹，鍋裡有各種海鮮，唯一缺點就是蝦殼要自己剝🤣"
+  },
+  {
+    "name": "Hug Sushi Woodbridge",
+    "address": "3611 Major MacKenzie Dr., Vaughan, ON L4H 2Y8",
+    "lat": 43.8647,
+    "lng": -79.5195,
+    "cuisine": "Japanese",
+    "type": "AYCE",
+    "rating": 3,
+    "city": "Markham",
+    "blog": "亞洲魂，不可能不愛日式\n但是這一船的壽司🍣 是讓我吃到怕了⋯\n\n📍Hug sushi Woodbridge\n這間距離Wonderland大約15分鐘，去完想吃日料的朋朋可以去！"
+  },
+  {
+    "name": "MABU 麻布",
+    "address": "578 Yonge St, Toronto, ON M4Y 1Z3",
+    "lat": 43.6612,
+    "lng": -79.3847,
+    "cuisine": "Taiwanese",
+    "type": "Comfort Food",
+    "rating": 2,
+    "city": "Toronto",
+    "blog": "滷肉飯狂人來報到！\n這間的滷肉飯份量夠味道也夠，缺點就是小小貴💸（但多倫多dt 沒有東西是不貴的😩\n\n📍MABU 麻布： 578 Yonge St, Toronto, ON M4Y 1Z3\n這間在加拿大有分店，我去的是dt的，去的時間是晚上10點多左右，還是很多人！建議多人去的話可以先訂位"
+  },
+  {
+    "name": "Dolce Gelato",
+    "address": "234 Augusta Ave, Toronto, ON M5T 2L7",
+    "lat": 43.6538,
+    "lng": -79.4036,
+    "cuisine": "Italian",
+    "type": "Dessert",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "沒人能夠抗拒冰淇淋！😻\n這間在Kensington Market 肯辛頓市場附近\n\n📍Dolce Gelato ：234 Augusta Ave, Toronto, ON M5T 2L7 CA\n\n1️⃣ cioccolato：甜中帶苦，本人是巧克力魔人，去到哪都要點巧克力，這間的巧克力我力推！\n（補個知識點：Cioccolato是義大利文喔！）\n\n2️⃣ tiramisu ：甜度適中不會過甜，而且吃起來有酒釀的香味！酒鬼本人特別愛😍\n\n剛好都點到個人很愛的口味，好肥但是快樂百分百💯"
+  },
+  {
+    "name": "Firehouse Subs",
+    "address": "165 N Queen St, Etobicoke, ON M9C 1A7",
+    "lat": 43.5863,
+    "lng": -79.5395,
+    "cuisine": "American",
+    "type": "Fast Food",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "多倫多潛艇堡首吃！\n本人在這之前唯一吃過的潛艇堡只有Subway⋯\n這間是意外發現的店，原本不報期待，結果意外的還可以！\n\n我點 Medium Smokehouse Beef & Cheddar Briske\n麵包有烤過偏軟，蠻好咬的，我點的這份是純肉+起司沒有生菜，吃到最後有點膩⋯\n\n不會特別推薦大家去吃，但是有經過不知道吃什麼或是趕時間的朋友，可以試試！"
+  },
+  {
+    "name": "Flaming Noodles",
+    "address": "373 Spadina Ave., Toronto, ON M5T 2G3",
+    "lat": 43.6545,
+    "lng": -79.3987,
+    "cuisine": "Chinese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "這間是我在多倫多吃過少數好吃的四川麵\n份量足 味道夠\n\n我點的是宜賓燃麵(Flaming Noodles)\n本人平時吃小辣至中辣 這碗的辣度恰到好處\n手工炸製的辣椒油、勁道的麵條\n\n如果是只吃小辣的朋友可能要三思!!"
+  },
+  {
+    "name": "江城小酒館",
+    "address": "3000 Hwy 7 Unit 02, Markham, ON L3R 6E1",
+    "lat": 43.8566,
+    "lng": -79.3338,
+    "cuisine": "Chinese",
+    "type": "BBQ",
+    "rating": 3,
+    "city": "Markham",
+    "blog": "如果你在萬錦晚上不知道上哪吃宵夜\n可以考慮來這間吃串串！\n\n夠味的烤串配上啤酒 加上 麻辣小龍蝦 誰能抗拒這樣的組合\n\n雖然小龍蝦的價格不便宜 但對於不想在家自己搞的朋友\n非常適合來這三五好友一起吃"
+  },
+  {
+    "name": "Buster's Sea Cove",
+    "address": "93 Front St E, Toronto, ON M5E 1M6",
+    "lat": 43.6455,
+    "lng": -79.3786,
+    "cuisine": "Canadian",
+    "type": "Seafood",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "在多倫多的想必各位都一定被推過這間龍蝦堡\n地點就在多倫多老城區的聖勞倫斯市場內\n\n但我個人認為這間有點過譽 沒有大家說的那麼好吃\n現場大排長龍 餐點現做 但不知道是不是人多的關係\n感覺餐點做的有點敷衍\n\n我點的是龍蝦堡 新鮮度肯定不能跟靠港的地區比\n龍蝦不是特別鮮甜 配餐薯條也不太符合我的胃\n（個人喜歡酥酥脆脆的那種 不喜歡這種軟軟的口感\n\n市場內有多攤位, 這間在靠邊的轉角處, 往內走找到要下樓的樓梯, 旁邊那間就是了"
+  },
+  {
+    "name": "Ikkousha Ramen",
+    "address": "249 Queen St W, Toronto, ON M5V 1Z4",
+    "lat": 43.6472,
+    "lng": -79.3944,
+    "cuisine": "Japanese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "身為拉麵愛好者的我 終於在多倫多吃到好吃的拉麵啦！\n這次有幸跟日本朋友一起來探店 也是他推薦我來吃的這間\n\n地點在市政廣場附近 冬天溜冰結束來碗熱的拉麵最適合不過\n本人無辣不歡 來到這肯定不能放過任何可以吃辣的機會\n\n我這次點的是 GOD FIRE - Spicy Level 2 辣味等級2\n整體湯頭是順口的辣味豚骨 配上軟硬適中的細麵\n我給這碗拉麵8.5/10分！！！\n\n其次 每次去到拉麵店都一定位點一盤煎餃配\n這間的煎餃恰到好處 不會太油 也很多汁\n兩個人去 一人一碗拉麵再分一盤煎餃非常剛好！\n\n這間剛在Yonge street 上開了新店, 住在Yonge街上的朋友有福了"
+  },
+  {
+    "name": "Som Tum Jinda",
+    "address": "76 Gerrard St E, Toronto, ON M5G 2A7",
+    "lat": 43.6584,
+    "lng": -79.3798,
+    "cuisine": "Thai",
+    "type": "Thai",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "米其林指南推薦的泰式餐廳\n地點在多倫多市中心靠近TMU\n\n這次是七個好友一起來探店\n我們先是點了前菜\n\n▸ Kor Moo Yang/ 烤豬頸肉\n這道必點, 他一上桌直接秒殺, 味道夠外加口感Ｑ彈\n\n▸ Som Tum Tod/ 涼拌木瓜絲\n如果想來點清淡的可以點! 但是豆角的味道有點太生\n\n▸ Pad See Eew (Beef)/ 炒牛肉河粉\n這道整體味道偏甜, 不是很合我的胃口\n\n▸ Pad Woonsen Cha-Om (Minced Chicken)/ 炒雞肉冬粉\n這道是我們整所有裡面最好吃的一道, 整體味道剛好, 不會太鹹也不會太甜\n\n很可惜這次沒有吃到泰式咖哩, 總體來說, 值得大家來探店！"
+  },
+  {
+    "name": "The Owl on Bloor",
+    "address": "700 Bloor St W, Toronto, ON M6G 1L5",
+    "lat": 43.6666,
+    "lng": -79.4094,
+    "cuisine": "Korean",
+    "type": "Korean",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "亞洲胃這次來探多倫多韓式餐館啦！\n大家都說韓餐要去K town吃 但身為一位downtown人\n不想去太遠的北邊 首選肯定是bloor街上的小韓國城\n\n▸ Pork Bone Soup/ 韓式豬骨湯\n這道是冬天首選 誰能抗拒在加拿大的冷天來一碗熱乎的韓式湯 豬骨燉的很入味很嫩\n\n▸ Korean Style Seafood Pancake/ 韓式海鮮煎餅\n堪比臉大且扎實的海鮮煎餅 算是我吃韓式到現在 少數份量足夠且不偷工減料的煎餅\n\n小菜還可以免費續！！ 推薦大家去吃!!"
+  },
+  {
+    "name": "Scaddabush",
+    "address": "200 Front St W Unit #G001, Toronto, ON M5V 3J1",
+    "lat": 43.6451,
+    "lng": -79.3870,
+    "cuisine": "Italian",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "亞洲胃今天來吃義式料理 來到這間Scaddabush Italia Restaurant\n在多倫多很多地方都有分店 我這次去的是在Downtown分店\n\n▸ Spinach & Artichoke Dip\n這道菜一上直接被我們秒殺 他是用菠菜＋洋薊混合做成的沾醬 旁邊附上酥脆的吐司\n沾醬口感綿密 但又不像奶油那樣吃久會很膩\n\n▸ Margherita Pizza\n經典Pizza 特別的點是 這間的Pizza不大且形狀是細長形\n\n▸ Spaghetti Carbonara\n這道是我私心想點 義大利麵中最愛的就是carbonara\n最上面有放生蛋黃 真的是畫龍點睛\n\n整體分數 8/10 服務生很熱情 送餐速度很快\n如果是多人聚會 蠻推薦來這間的！"
+  },
+  {
+    "name": "Kinton Ramen",
+    "address": "402 Queen St W, Toronto, ON M5V 2A6",
+    "lat": 43.6483,
+    "lng": -79.3931,
+    "cuisine": "Japanese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "亞洲胃又來啦！這次是拉麵特輯 第二站\n這次跟三五好友從Queen Street West 附近逛街完肚子餓\n經過這間之前就一直想吃的店\n\n我這次點 Pork Spicy Garlic Ramen\n整體湯頭味道非常香 麵條用的是粗偏細 配上一大坨的蒜頭\n可以說是愛蒜人的福音 唯一的缺點是湯頭聞著香 但實際喝起來時沒有很濃郁\n\n朋友點的是 Pork Original Ramen\n整體是醬油湯底 味道不會過鹹\n\n整體 6.5/10 (口味問題 我個人比較喜歡濃郁系的拉麵"
+  },
+  {
+    "name": "Ramen Isshin",
+    "address": "421 College St, Toronto, ON M5T 1T1",
+    "lat": 43.6564,
+    "lng": -79.4108,
+    "cuisine": "Japanese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "多倫多拉麵特輯第三彈來啦！\n喜歡拉麵 在多倫多的朋友 應該沒有人不知道這間的吧?\n\n▸ Deep Fried Pork Gyoza/ 炸豬肉餃子\n這間的餃子餡好吃夠味 但本人比較喜歡吃煎餃勝過於炸餃子\n\n▸ Spicy Red Miso/ 辣味味增拉麵\n來了來了！重點登場 這間的拉麵湯頭濃郁 辣味適中\n湯汁完美的吸附在偏粗的麵條上 再配上清爽的豆芽菜 簡直不要太完美\n\n整體我給他9/10！！！\n\n他在多倫多有三間分店 我這次去的是College的那間 去的時間剛好不用排隊"
+  },
+  {
+    "name": "Orientalbasil",
+    "address": "10815 Yonge St. Unit 3&4, Richmond Hill, ON L4C 3E3",
+    "lat": 43.8700,
+    "lng": -79.4400,
+    "cuisine": "Taiwanese",
+    "type": "Main Rice",
+    "rating": 4,
+    "city": "Markham",
+    "blog": "在多倫多的台灣人請舉手！想問大家是不是都很想念台灣味呀？\n這間是在多倫多北邊Richmond Hill 這邊的餐館\n\n這算是少數我吃過味道夠味 樣貌復刻的滷肉飯/ 控肉飯\n他的滷肉飯屬於肥瘦偏多 吃完會有點黏嘴的那種\n\n同行人點的是控肉飯便當 他們的用料很十足 給的量也很大方\n\n另外我們也有點鹹酥雞跟炸甜不辣\n鹹酥雞真的超級復刻的！看那個樣子就知道 還有配上蒜頭碎跟蔥花 簡直不要太完美\n\n實不相瞞 這已經是我二訪這間店了！很明顯看得出來我很愛吧?"
+  },
+  {
+    "name": "Ramen Raijin",
+    "address": "24 Wellesley St. West Rear, Toronto, ON M4Y 2X6",
+    "lat": 43.6656,
+    "lng": -79.3845,
+    "cuisine": "Japanese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "多倫多拉麵第四彈！拉麵特輯我又來啦～\n這次是日本朋友力推的雷神拉麵/ Ramen Raijin\n\n▸ Kara-age/ 唐揚炸雞\n對於炸雞 我個人是沒有太多評價 只要是酥脆的炸雞我都很愛\n\n▸ Spicy Tonkotsu Ramen/ 辣味豬骨拉麵\n雷神的拉麵真的名不虛傳 麵條粗細一般 重點是他很濃郁！\n配上辣味湯頭簡直是吃辣的福心 重點他的辣是只吃小辣的朋友也能接受的那種！\n\n整體我給9.5/10 不愧是在多倫多Downtown名不虛傳的拉麵店"
+  },
+  {
+    "name": "Chopfire 西門炊煙",
+    "address": "335 Spadina Ave., Toronto, ON M5T 2E9",
+    "lat": 43.6551,
+    "lng": -79.3956,
+    "cuisine": "Chinese",
+    "type": "Szechuan",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "三五好友來探店！這次來到西門炊煙 位在多倫多的中國城Chinatown\n他們家主打川菜湘菜 口味偏油辣 如果是不敢吃辣的朋友 可能要三思了！\n\n▸ 麻婆豆腐\n配白飯的最佳首選 這道菜品是我們點的三道裡最不辣的一道 豆腐嫩但不碎\n\n▸ 高麗菜炒豬肉\n吃合菜肯定要來點菜的吧？這道味道偏辣 高麗菜上帶辣油\n\n▸ 土豆燉豬肉\n這道是我最愛的一道菜品 但也是所有菜品裡最辣的一道！\n不過他的土豆燉的夠入味 不會死鹹 配飯很剛好！\n\n整體評價7.5/10 因為他是川菜 整體菜品都偏辣"
+  },
+  {
+    "name": "HOJA 好呷",
+    "address": "3235 Hwy 7 #27, Markham, ON L3R 3P9",
+    "lat": 43.8577,
+    "lng": -79.3356,
+    "cuisine": "Taiwanese",
+    "type": "Main Rice",
+    "rating": 4,
+    "city": "Markham",
+    "blog": "台灣胃上線！這次又來到北邊吃台菜啦～\n今天這間在Markham 的First Market Place\n這間主打台灣菜 看到菜單上有麵線/ 滷肉飯 忍不住再遠也要開車來\n\n▸ 台式滷肉飯配半熟蛋＋早餐店紅茶\n餐點一上來 我差點以為自己回到台灣 簡直不要太復刻\n還配上台灣人都懂的醃漬黃瓜 而且HOJA他們家的滷肉肥瘦適中 味道不會太鹹或太甜\n\n整體評價9.5/10 如果是在多倫的尋找台灣味的朋友 拜託一定要來這間\n\n這次的遺憾就是沒有吃到麵線 下次有機會一定要去嚐鮮他們家的麵線\n另外聽說他們家要開分店 主打熱炒/羊肉爐 好期待啊！"
+  },
+  {
+    "name": "Eataly Downtown",
+    "address": "55 Bloor St W, Toronto, ON M4W 1A6",
+    "lat": 43.6700,
+    "lng": -79.3900,
+    "cuisine": "Italian",
+    "type": "Market",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "有人知道Eataly是多倫多本土的Italian Marketplace嗎？\n在這個文化大熔爐裡 多倫多的城市內隱藏著一間保函義式風情的商店\n這次去的是位在市中心Bloor Street上的門店\n\n他這裡不僅有主打義式的餐館 也有專門賣義式相關的場品(麵條, 肉品等…\n一樓還有義式餐酒館 喜歡喝酒的朋友 快來去嚐鮮～\n\n▸ LINGUINE ALLO SCOGLIO\n本人是Linguine的愛好者 這道菜品主要用了鮮蝦/起司/橄欖油\n簡單的配料卻能煮出不凡的義大利麵 香而不膩\n\n▸ SALUMIERE Pizza\n如果是Salami愛好者 這道Pizza絕對適合你！\n窯烤得香氣配上臘腸的香辣 簡直不要太絕配\n\n▸ TIRAMISÙ AL PISTACCHIO E CARAMELLO SALATO\n大家都說 主食是一個胃 甜點是另一個胃\n這道提拉米蘇 不僅僅是提拉米蘇本體 下面還帶有冰淇淋 甜而不膩"
+  },
+  {
+    "name": "Street Grill Bar 酒街串巷",
+    "address": "3555 Don Mills Rd unit 11, North York, ON M2H 3N3",
+    "lat": 43.7751,
+    "lng": -79.3444,
+    "cuisine": "Chinese",
+    "type": "BBQ",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": "多倫多居酒屋探店第一彈！\n有沒有愛吃烤串又愛喝酒的朋友！？\n這次來到酒街串巷 也算是久仰其名了\n\n▸ 烤煉乳麵包片\n這道剛上時我還覺得平平無奇 吃了之後發現還挺好吃的 有煉乳香 吐司外皮也被烤得酥酥的\n\n▸ 串巷豆皮捲\n這道我朋友最愛！但身為不敢吃香菜的我… 我只能退步三分\n\n▸ 錫紙芝士玉米\n字面上的芝士配玉米 應該沒有人不愛吧？\n\n整體來說 是間適合朋友聚會的好餐館\n聽說他最近也開來多倫多Downtown了！住在DT的朋友享福啦～"
+  },
+  {
+    "name": "After Seven 後七",
+    "address": "10 Stephanie St, Toronto, ON M5T 0B6",
+    "lat": 43.6518,
+    "lng": -79.3923,
+    "cuisine": "Chinese",
+    "type": "Bar",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": "隱身在酸奶店背後的神秘酒吧 位於多倫多的Chinatown\n要不是朋友跟我說 我自己可能都找不到他的入口\n\nAfter Seven 後七\n如果你走到上面的地址 不要懷疑走進酸奶店 你會看到一道很不像酒吧門口的門\n這時千萬不要推門進去 耐心等待來應門的人 你會有一種發現新大陸的感覺\n\n▸ Espressotini\n這杯是身為咖啡愛好者的我點的 濃郁的咖啡香配上Baileys奶酒 簡直不要太完美\n\n▸ Strawberry Tetsu\n這杯是友人點的 基底是Gin酒 喝起來有點像草莓起司酒 意外的還挺好喝的\n\n整體來說是一間神秘又值得探索的酒吧 我會給到8.5/10\n缺點就是他店內空間小 沒辦法一次容納太多人 所以建議平日或是提前訂位"
+  },
+  {
+    "name": "Foxley Bistro",
+    "address": "207 Ossington Ave, Toronto, ON M6J 2Z8",
+    "lat": 43.6494,
+    "lng": -79.4184,
+    "cuisine": "Taiwanese",
+    "type": "Creative",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "ZhaZhaBeef 炸炸牛",
+    "address": "8360 Kennedy Rd Unit B2, Markham, ON L3R 9W4",
+    "lat": 43.835,
+    "lng": -79.2854,
+    "cuisine": "Chinese",
+    "type": "Hot Pot",
+    "rating": 3,
+    "city": "Markham",
+    "blog": null
+  },
+  {
+    "name": "SukhoTHAI",
+    "address": "52 Wellington St E, Toronto, ON M5E 1E3",
+    "lat": 43.6464,
+    "lng": -79.3738,
+    "cuisine": "Thai",
+    "type": "Thai",
+    "rating": 5,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Congee Queen 粥麵莊",
+    "address": "362 Yonge St, Toronto, ON M5B 1S5",
+    "lat": 43.6588,
+    "lng": -79.3843,
+    "cuisine": "Chinese",
+    "type": "Comfort Food",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Bao House",
+    "address": "5336 Yonge St, North York, ON M2N 5P9",
+    "lat": 43.7680,
+    "lng": -79.4130,
+    "cuisine": "Chinese",
+    "type": "Main Noodle",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Capra's Kitchen",
+    "address": "1834 Lakeshore Rd W, Mississauga, ON L5J 1J7",
+    "lat": 43.5049,
+    "lng": -79.6199,
+    "cuisine": "Italian",
+    "type": "Main Noodle",
+    "rating": 3,
+    "city": "Mississauga",
+    "blog": null
+  },
+  {
+    "name": "Flipper's",
+    "address": "31 Elm St, Toronto, ON M5G 1H1",
+    "lat": 43.6564,
+    "lng": -79.3862,
+    "cuisine": "Japanese",
+    "type": "Dessert",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Karahi Boys",
+    "address": "741 Queen St W, Toronto, ON M6J 1G1",
+    "lat": 43.6454,
+    "lng": -79.4107,
+    "cuisine": "Middle Eastern",
+    "type": "Curry",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "M2 Night Bar",
+    "address": "407 Church St, Toronto, ON M5B 1J2",
+    "lat": 43.6599,
+    "lng": -79.3799,
+    "cuisine": "Japanese",
+    "type": "Bar",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Koh Lipe",
+    "address": "35 Baldwin St, Toronto, ON M5T 1L1",
+    "lat": 43.6541,
+    "lng": -79.3929,
+    "cuisine": "Thai",
+    "type": "Thai",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "CONG Caphe",
+    "address": "3 Elm St, Toronto, ON M5G 1H1",
+    "lat": 43.657,
+    "lng": -79.3849,
+    "cuisine": "Vietnamese",
+    "type": "Coffee",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Raku",
+    "address": "456 Queen St W, Toronto, ON M5V 2A8",
+    "lat": 43.6487,
+    "lng": -79.4021,
+    "cuisine": "Japanese",
+    "type": "Main Noodle",
+    "rating": 5,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Hokkaido Ramen Santouka",
+    "address": "91 Dundas St E, Toronto, ON M5B 2C8",
+    "lat": 43.6560,
+    "lng": -79.3850,
+    "cuisine": "Japanese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Matcha Matcha",
+    "address": "407 Church St, Toronto, ON M5B 1J2",
+    "lat": 43.6600,
+    "lng": -79.3790,
+    "cuisine": "Japanese",
+    "type": "Tea",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Cafe Landwer",
+    "address": "9340 Bathurst St #1, Maple, ON L6A 4N9",
+    "lat": 43.8796,
+    "lng": -79.444,
+    "cuisine": "American",
+    "type": "Brunch",
+    "rating": 3,
+    "city": "Mississauga",
+    "blog": null
+  },
+  {
+    "name": "Buk Chang Dong Soon Tofu",
+    "address": "5445 Yonge St, North York, ON M2N 6K7",
+    "lat": 43.7720,
+    "lng": -79.4130,
+    "cuisine": "Korean",
+    "type": "Korean",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "The Cups",
+    "address": "5647 Yonge St, North York, ON M2M 3T2",
+    "lat": 43.7780,
+    "lng": -79.4130,
+    "cuisine": "Japanese",
+    "type": "Dessert",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Rasa",
+    "address": "196 Robert St, Toronto, ON M5S 2K7",
+    "lat": 43.6558,
+    "lng": -79.3994,
+    "cuisine": "Italian",
+    "type": "Creative",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Pai Toronto",
+    "address": "18 Duncan St, Toronto, ON M5H 3G8",
+    "lat": 43.6490,
+    "lng": -79.3880,
+    "cuisine": "Thai",
+    "type": "Thai",
+    "rating": 5,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Gusto 501",
+    "address": "501 King St E, Toronto, ON M5A 1L9",
+    "lat": 43.6510,
+    "lng": -79.3720,
+    "cuisine": "Italian",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "ROOMS Coffee",
+    "address": "135 Ossington Ave, Toronto, ON M6J 2Z6",
+    "lat": 43.6488,
+    "lng": -79.4213,
+    "cuisine": "Japanese",
+    "type": "Cafe",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "The Lunch Lady",
+    "address": "93 Ossington Ave, Toronto, ON M6J 2Z2",
+    "lat": 43.6464,
+    "lng": -79.4192,
+    "cuisine": "Vietnamese",
+    "type": "Main Noodle",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "台妹滷味",
+    "address": "3272 Midland Ave B120, Scarborough, ON M1V 0C4",
+    "lat": 43.8187,
+    "lng": -79.2936,
+    "cuisine": "Taiwanese",
+    "type": "Snacks",
+    "rating": 5,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Pizzeria Badiali",
+    "address": "181 Dovercourt Rd, Toronto, ON M6J 3C6",
+    "lat": 43.6432,
+    "lng": -79.4216,
+    "cuisine": "Italian",
+    "type": "Pizza",
+    "rating": 5,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Mizzica Gelateria",
+    "address": "307 Queen St W, Toronto, ON M5V 2A4",
+    "lat": 43.6490,
+    "lng": -79.3950,
+    "cuisine": "Italian",
+    "type": "Dessert",
+    "rating": 4,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Yakiniku Legend",
+    "address": "35 McCaul St unit 100, Toronto, ON M5T 1V7",
+    "lat": 43.6530,
+    "lng": -79.3910,
+    "cuisine": "Japanese",
+    "type": "BBQ",
+    "rating": 3,
+    "city": "Toronto",
+    "blog": null
+  },
+  {
+    "name": "Schwartz's Deli",
+    "address": "3895 Boul. Saint-Laurent, Montréal, QC H2W 1K4",
+    "lat": 45.5188,
+    "lng": -73.5774,
+    "cuisine": "Canadian",
+    "type": "Deli",
+    "rating": 5,
+    "city": "Montreal",
+    "blog": null
+  },
+  {
+    "name": "St-Viateur Bagel",
+    "address": "1127 Avenue du Mont-Royal E, Montréal, QC H2J 1X9",
+    "lat": 45.5262,
+    "lng": -73.5897,
+    "cuisine": "Canadian",
+    "type": "Bakery",
+    "rating": 5,
+    "city": "Montreal",
+    "blog": null
+  },
+  {
+    "name": "D'Orsay",
+    "address": "65 Rue De Buade, Québec, QC G1R 4A2",
+    "lat": 46.8139,
+    "lng": -71.2048,
+    "cuisine": "French",
+    "type": "Fine Dining",
+    "rating": 5,
+    "city": "Quebec City",
+    "blog": null
+  },
+  {
+    "name": "Korean Garden",
+    "address": "7197 Stanley Ave, Niagara Falls, ON L2G 3Z2",
+    "lat": 43.0896,
+    "lng": -79.0849,
+    "cuisine": "Korean",
+    "type": "Korean",
+    "rating": 4,
+    "city": "Niagara",
+    "blog": null
+  },
+  {
+    "name": "Saltlick Smokehouse",
+    "address": "282 James St N, Hamilton, ON L8R 2L3",
+    "lat": 43.2630,
+    "lng": -79.8700,
+    "cuisine": "American",
+    "type": "BBQ",
+    "rating": 4,
+    "city": "Hamilton",
+    "blog": null
+  },
+  {
+    "name": "Wooden Heads Pizza",
+    "address": "192 Ontario St, Kingston, ON K7L 2Y8",
+    "lat": 44.2300,
+    "lng": -76.4820,
+    "cuisine": "Italian",
+    "type": "Pizza",
+    "rating": 5,
+    "city": "Kingston",
+    "blog": null
+  },
+  {
+    "name": "Pan ChanCho Bakery",
+    "address": "44 Princess St, Kingston, ON K7L 1A4",
+    "lat": 44.2310,
+    "lng": -76.4850,
+    "cuisine": "Canadian",
+    "type": "Bakery",
+    "rating": 4,
+    "city": "Kingston",
+    "blog": null
+  },
+  {
+    "name": "Baker Street Station",
+    "address": "76 Baker St, Guelph, ON N1H 3V5",
+    "lat": 43.5450,
+    "lng": -80.2480,
+    "cuisine": "Canadian",
+    "type": "Pub",
+    "rating": 3,
+    "city": "Guelph",
+    "blog": null
+  },
+  {
+    "name": "Greystones Cafe",
+    "address": "61 Broadway, Orangeville, ON L9W 1J8",
+    "lat": 43.9200,
+    "lng": -80.0940,
+    "cuisine": "Canadian",
+    "type": "Coffee",
+    "rating": 3,
+    "city": "Orangeville",
+    "blog": null
+  },
+  {
+    "name": "Kawartha Dairy",
+    "address": "178 ON-60, Huntsville, ON P1H 1G2",
+    "lat": 45.3350,
+    "lng": -79.2300,
+    "cuisine": "Canadian",
+    "type": "Dessert",
+    "rating": 4,
+    "city": "Huntsville",
+    "blog": null
+  }
+];
 
     // ============================================
     // APPLICATION CODE
@@ -1042,7 +1442,6 @@
     let markers = [];
     let currentFilters = { city: 'all', cuisine: 'all', rating: 'all' };
 
-    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
       initFilters();
@@ -1051,45 +1450,33 @@
       renderRestaurants();
     });
 
-    // Initialize map
     function initMap() {
-      map = L.map('map', {
-        center: [43.6532, -79.3832],
-        zoom: 11
-      });
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      map = L.map('mapContainer', { center: [43.6532, -79.3832], zoom: 10 });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19
       }).addTo(map);
-
       addMarkers();
     }
 
-    // Add markers
     function addMarkers() {
       markers.forEach(m => map.removeLayer(m));
       markers = [];
-
       const filtered = getFilteredRestaurants();
-
       filtered.forEach(r => {
         const icon = L.divIcon({
           className: 'custom-marker-wrapper',
           html: `<div class="custom-marker">${getCuisineEmoji(r.cuisine)}</div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
         });
-
         const marker = L.marker([r.lat, r.lng], { icon })
           .addTo(map)
           .bindPopup(createPopupContent(r));
-
         marker.on('click', () => openModal(r));
         markers.push(marker);
       });
-
       if (markers.length > 0) {
         const group = L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
@@ -1097,25 +1484,18 @@
     }
 
     function getCuisineEmoji(cuisine) {
-      const map = {
+      const m = {
         'Japanese': '🍜', 'Thai': '🍲', 'Chinese': '🥡', 'Taiwanese': '🧋',
         'Italian': '🍝', 'Korean': '🍖', 'Vietnamese': '🍜', 'Canadian': '🍁',
-        'French': '🥐', 'Middle East': '🧆', 'American': '🍔'
+        'French': '🥐', 'Middle Eastern': '🧆', 'American': '🍔'
       };
-      return map[cuisine] || '🍽️';
+      return m[cuisine] || '🍽️';
     }
 
     function createPopupContent(r) {
-      return `
-        <div class="popup-content">
-          <div class="popup-title">${r.name}</div>
-          <div class="popup-cuisine">${r.cuisine} • ${r.type}</div>
-          <div class="popup-rating">${'⭐'.repeat(r.rating)}</div>
-        </div>
-      `;
+      return `<div class="popup-content"><div class="popup-title">${r.name}</div><div class="popup-cuisine">${r.cuisine} · ${r.type}</div><div class="popup-rating">${'⭐'.repeat(r.rating)}</div></div>`;
     }
 
-    // Filters
     function initFilters() {
       const cityFilter = document.getElementById('cityFilter');
       const cuisineFilter = document.getElementById('cuisineFilter');
@@ -1139,7 +1519,6 @@
       cityFilter.addEventListener('change', e => { currentFilters.city = e.target.value; applyFilters(); });
       cuisineFilter.addEventListener('change', e => { currentFilters.cuisine = e.target.value; applyFilters(); });
       ratingFilter.addEventListener('change', e => { currentFilters.rating = e.target.value; applyFilters(); });
-      
       resetBtn.addEventListener('click', () => {
         currentFilters = { city: 'all', cuisine: 'all', rating: 'all' };
         cityFilter.value = cuisineFilter.value = ratingFilter.value = 'all';
@@ -1156,23 +1535,17 @@
       });
     }
 
-    function applyFilters() {
-      addMarkers();
-      renderRestaurants();
-    }
+    function applyFilters() { addMarkers(); renderRestaurants(); }
 
-    // Render cards
     function renderRestaurants() {
       const container = document.getElementById('restaurantList');
       const filtered = getFilteredRestaurants();
-
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No restaurants found</p></div>`;
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No restaurants found matching your filters</p></div>`;
         return;
       }
-
-      container.innerHTML = filtered.map(r => `
-        <div class="restaurant-card" onclick='openModal(${JSON.stringify(r).replace(/'/g, "\\'")})'>
+      container.innerHTML = filtered.map((r, i) => `
+        <div class="restaurant-card" onclick='openModalByIndex(${restaurants.indexOf(r)})'>
           <div class="card-header">
             <h3 class="card-title">${r.name}</h3>
             <span class="card-rating">${'⭐'.repeat(r.rating)}</span>
@@ -1180,11 +1553,11 @@
           <span class="card-cuisine">${r.cuisine}</span>
           <p class="card-address">${r.address}</p>
           <p class="card-city">📍 ${r.city}</p>
+          ${r.blog ? `<p class="card-preview">${r.blog.substring(0, 80)}...</p>` : ''}
         </div>
       `).join('');
     }
 
-    // Stats animation
     function updateStats() {
       animateNumber('totalPlaces', restaurants.length);
       animateNumber('totalCities', new Set(restaurants.map(r => r.city)).size);
@@ -1193,9 +1566,8 @@
 
     function animateNumber(id, target) {
       const el = document.getElementById(id);
-      const duration = 1500;
+      const duration = 1200;
       const start = performance.now();
-      
       function update(now) {
         const progress = Math.min((now - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
@@ -1205,7 +1577,6 @@
       requestAnimationFrame(update);
     }
 
-    // Modal
     function initModal() {
       const modal = document.getElementById('detailModal');
       document.getElementById('closeModal').addEventListener('click', closeModal);
@@ -1213,21 +1584,19 @@
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
     }
 
+    function openModalByIndex(i) { openModal(restaurants[i]); }
+
     function openModal(r) {
       const modal = document.getElementById('detailModal');
+      document.getElementById('modalCuisineType').textContent = r.cuisine + ' · ' + r.type;
       document.getElementById('modalTitle').textContent = r.name;
       document.getElementById('modalRating').textContent = '⭐'.repeat(r.rating);
       document.getElementById('modalAddress').textContent = r.address;
-      document.getElementById('modalCuisine').textContent = r.cuisine;
       document.getElementById('modalType').textContent = r.type;
-      
       const blogEl = document.getElementById('modalBlog');
       blogEl.textContent = r.blog || '';
       blogEl.style.display = r.blog ? 'block' : 'none';
-      
-      document.getElementById('modalMapLink').href = 
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + r.address)}`;
-      
+      document.getElementById('modalMapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' ' + r.address)}`;
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
