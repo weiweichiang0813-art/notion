@@ -1,18 +1,18 @@
-# 🍜 Winnie's Food Map
+# 🍽️ Winnie's Food Map
 
-互動式美食地圖網站，展示加拿大各地的美食探索紀錄。
+An interactive culinary map showcasing food exploration records across Canada.
 
-## 🚀 快速部署到 GitHub Pages
+## 🚀 Quick Deployment to GitHub Pages
 
-### 步驟 1: 建立 GitHub Repository
-1. 前往 [github.com/new](https://github.com/new)
-2. Repository name: `food-map` (或你喜歡的名稱)
-3. 選擇 **Public**
-4. 點擊 **Create repository**
+### Step 1: Create a GitHub Repository
+1. Go to [github.com/new](https://github.com/new)
+2. Repository name: `food-map` (or your preferred name)
+3. Select **Public**
+4. Click **Create repository**
 
-### 步驟 2: 上傳檔案
+### Step 2: Upload Files
 ```bash
-# 在本地資料夾執行
+# Execute in your local folder
 git init
 git add .
 git commit -m "Initial commit: Food map website"
@@ -21,99 +21,99 @@ git remote add origin https://github.com/你的帳號/food-map.git
 git push -u origin main
 ```
 
-### 步驟 3: 啟用 GitHub Pages
-1. 進入 Repository → **Settings**
-2. 左側選單找到 **Pages**
-3. Source 選擇 **Deploy from a branch**
-4. Branch 選擇 **main** / **(root)**
-5. 點擊 **Save**
+### Step 3: Enable GitHub Pages
+1. Navigate to Repository → **Settings**
+2. Find **Pages** in the left sidebar
+3. Under Source, select **Deploy from a branch**
+4. Select **main** / **(root)** for the branch
+5. Click **Save**
 
-等待約 1-2 分鐘，你的網站就會在：
-`https://你的帳號.github.io/food-map/`
+Wait 1-2 minutes, and your site will be live at:
+`https://YourUsername.github.io/food-map/`
 
 ---
 
-## 📝 如何新增餐廳
+## 📝 How to Add Restaurants
 
-編輯 `data/restaurants.json` 檔案，新增餐廳資料：
+Edit the `data/restaurants.json` file to add new entries:
 
 ```json
 {
-  "name": "餐廳名稱",
-  "address": "地址",
-  "lat": 43.6532,      // 緯度
-  "lng": -79.3832,     // 經度
-  "cuisine": "Japanese", // 料理類型
-  "type": "Main Noodle", // 餐點類型
-  "rating": 4,          // 評分 1-5
-  "city": "Toronto",    // 城市
-  "blog": "你的心得文章（可選，留空則填 null）"
+  "name": "Restaurant Name",
+  "address": "Address",
+  "lat": 43.6532,      // Latitude
+  "lng": -79.3832,     // Longitude
+  "cuisine": "Japanese", // Cuisie type
+  "type": "Main Noodle", // Restaurant type
+  "rating": 4,          // Rating 1-5
+  "city": "Toronto",    // City
+  "blog": "Your review link（Optional, otherwise use null）"
 }
 ```
 
-### 如何取得座標 (lat, lng)？
+### How to get Coordinates (lat, lng)?
 
-**方法 1: Google Maps**
-1. 打開 [Google Maps](https://maps.google.com)
-2. 搜尋餐廳名稱
-3. 右鍵點擊地點 → 第一行就是座標
-4. 點擊複製座標
+**Method 1: Google Maps**
+1. Open [Google Maps](https://maps.google.com)
+2. Search for the restaurant.
+3. Right-click the location → The first line shows the coordinates.
+4. Click to copy.
 
-**方法 2: 直接從地址搜尋**
-1. 搜尋餐廳地址
-2. 網址中會有類似 `@43.6532,-79.3832,17z`
-3. 第一個數字是緯度，第二個是經度
+**Method 2: Extract from URL**
+1. Search for the address.
+2. The URL will contain something like `@43.6532,-79.3832,17z`
+3. The first number is Latitude; the second is Longitude.
 
 ---
 
-## 🎨 自訂樣式
+## 🎨 Custom Styles
 
-主要顏色在 `css/style.css` 的 `:root` 區塊：
+Primary colors are located in the `:root` section of `css/style.css`:
 
 ```css
 :root {
-  --accent-primary: #6366f1;    /* 主色調 */
-  --accent-secondary: #a855f7;  /* 次要色調 */
-  --bg-primary: #0a0a0f;        /* 背景色 */
+  --accent-primary: #6366f1;    /* Primary Accent */
+  --accent-secondary: #a855f7;  /* Secondary Accent */
+  --bg-primary: #0a0a0f;        /* Background Color */
 }
 ```
 
 ---
 
-## 📁 檔案結構
+## 📁 File Structure
 
 ```
 food-map/
-├── index.html           # 主頁面
+├── index.html           # Main Page
 ├── css/
-│   └── style.css        # 樣式檔
+│   └── style.css        # Stylesheets
 ├── js/
-│   └── app.js           # 互動邏輯
+│   └── app.js           # Interactive Logic
 ├── data/
-│   └── restaurants.json # 餐廳資料
-└── README.md            # 說明文件
+│   └── restaurants.json # Restaurant Data
+└── README.md            # Documentation
 ```
 
 ---
 
-## 🔧 技術堆疊
+## 🔧 Tech Stack
 
-- **地圖**: Leaflet.js + CartoDB Dark Tiles
-- **樣式**: 純 CSS (與 Portfolio 一致的設計系統)
-- **字體**: Outfit + JetBrains Mono
-- **託管**: GitHub Pages (免費)
-
----
-
-## 📱 功能特色
-
-- ✅ 互動式深色地圖
-- ✅ 按城市/料理類型/評分篩選
-- ✅ 點擊查看詳細資訊和心得
-- ✅ 一鍵開啟 Google Maps 導航
-- ✅ 響應式設計 (手機/平板/電腦)
-- ✅ 與 Portfolio 風格一致
+- **Mapping**: Leaflet.js + CartoDB Dark Tiles
+- **Styling**: Pure CSS (Consistent with Portfolio design system)
+- **Typography**: Outfit + JetBrains Mono
+- **Hosting**: GitHub Pages (Free)
 
 ---
 
-Made with 🍜 by Winnie
+## 📱 Key Features
+
+- ✅ Interactive Dark Mode Map
+- ✅ Filter by City / Cuisine / Rating
+- ✅ Detailed Info & Reviews on Click
+- ✅ One-tap Google Maps Navigation
+- ✅ Fully Responsive (Mobile / Tablet / Desktop)
+- ✅ Consistent UI style with Portfolio
+
+---
+
+Made by Winnie
